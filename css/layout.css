@@ -1,0 +1,7 @@
+@media (max-width: 390px) {
+  html,
+  body {
+    width: 390px;
+    height: 844px;
+  }
+}
