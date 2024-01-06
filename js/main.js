@@ -62,3 +62,19 @@ const createPokemonCard = pokemon => {
 };
 
 fetchPokemons();
+
+document.getElementById('search-bar').addEventListener('input', function (e) {
+  var searchText = e.target.value; // Get the text from the search bar
+
+  var pokemon = pokeContainer.getElementsByClassName('pokemon'); // Get all the Pokemon
+
+  for (var i = 0; i < pokemon.length; i++) {
+    var name = pokemon[i].getElementsByClassName('info')[0].getElementsByClassName('name')[0].innerText;
+    // If the Pokemon's name includes the search text, show it, otherwise hide it
+    if (name.toLowerCase().includes(searchText.toLowerCase())) {
+      pokemon[i].style.display = '';
+    } else {
+      pokemon[i].style.display = 'none';
+    }
+  }
+});

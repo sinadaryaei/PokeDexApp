@@ -63,3 +63,17 @@ h1 {
   margin: 15px 0 7px;
   letter-spacing: 1px;
 }
+
+#search-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#search-bar {
+  width: 50%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
