@@ -8,9 +8,12 @@
   </head>
   <body>
     <h1>Pokedex</h1>
-    <form id="search-form">
-      <input type="search" id="search-bar" placeholder="Search Pokemon">
-    </form>
+    <div id="search-wrapper"> <!-- Add this line -->
+      <form id="search-form">
+        <input type="search" id="search-bar" placeholder="Search Pokemon">
+      </form>
+      <div id="suggestions-container"></div>
+    </div> <!-- Add this line -->
     <div class="poke-container" id="poke-container"></div>
     <div class="poke-container">
     </div>

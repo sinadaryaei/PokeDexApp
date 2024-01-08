@@ -68,12 +68,33 @@ h1 {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+  width: 100%;
+}
+
+/* ... existing styles ... */
+#search-wrapper {
+  position: relative;
+  width: 70%;
+  margin: auto;
 }
 
 #search-bar {
-  width: 50%;
-  padding: 10px;
+  width: 100%; /* Set the width to take up the full width of its container */
+  padding: 10px; /* Add some padding */
   border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
+}
+
+#suggestions-container {
+  position: absolute;
+  top: 100%; /* Position it right below the search bar */
+  left: 0; /* Align it with the left edge of the search bar */
+  width: 100%; /* Set the width to take up the full width of its container */
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1; /* This ensures that the suggestion box appears on top of other elements */
+  display: none; /* Hide it by default */
+}
+
+#suggestions-container.active {
+  display: block; /* Show it when it has the 'active' class */
 }
