@@ -1,4 +1,6 @@
 const pokeContainer = document.getElementById('poke-container');
+const suggestionsContainer = document.getElementById('suggestions-container');
+const searchBar = document.getElementById('search-bar');
 const pokemonCount = 150;
 const colors = {
   fire: '#FDDFDF',
@@ -45,89 +47,88 @@ const createPokemonCard = pokemon => {
 
   pokemonEl.style.backgroundColor = color;
 
-  const pokemonInnerHTML = `
-  <div class="img-container">
-      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png"" alt="${name}">
-  </div>
-  <div class="info">
-      <span class="number">#${id}</span>
-      <h3 class="name">${name}</h3>
-      <small class="type">Type: <span>${type}</span> </small>
-  </div>
-  `;
+  const imgContainer = document.createElement('div');
+  imgContainer.classList.add('img-container');
+  const img = document.createElement('img');
+  img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+  img.alt = name;
+  imgContainer.appendChild(img);
 
-  pokemonEl.innerHTML = pokemonInnerHTML;
+  const info = document.createElement('div');
+  info.classList.add('info');
+  const number = document.createElement('span');
+  number.classList.add('number');
+  number.textContent = `#${id}`;
+  const h3 = document.createElement('h3');
+  h3.classList.add('name');
+  h3.textContent = name;
+  const small = document.createElement('small');
+  small.classList.add('type');
+  const span = document.createElement('span');
+  span.textContent = type;
+  small.appendChild(span);
+  info.append(number, h3, small);
 
-  pokeContainer.appendChild(pokemonEl); // Corrected here
+  pokemonEl.append(imgContainer, info);
+
+  pokeContainer.appendChild(pokemonEl);
 };
 
 fetchPokemons();
 
-document.getElementById('search-bar').addEventListener('input', function (e) {
-  var searchText = e.target.value; // Get the text from the search bar
-  var pokeContainer = document.getElementById('poke-container');
-  var pokemon = pokeContainer.getElementsByClassName('pokemon'); // Get all the Pokemon
+// Function to filter Pokemon based on the search input and return the results
+function filterPokemon(searchText) {
+  const pokemons = pokeContainer.getElementsByClassName('pokemon');
+  return Array.from(pokemons).filter(pokemon => {
+    const name = pokemon.querySelector('.name').innerText.toLowerCase();
+    const number = pokemon.querySelector('.number').innerText.slice(1); // remove '#'
+    return name.includes(searchText.toLowerCase()) || number.startsWith(searchText);
+  });
+}
 
-  for (var i = 0; i < pokemon.length; i++) {
-    var name = pokemon[i].getElementsByClassName('info')[0].getElementsByClassName('name')[0].innerText; // Get the name of the Pokemon
-    var number = pokemon[i].getElementsByClassName('info')[0].getElementsByClassName('number')[0].innerText; // Get the number of the Pokemon
+// Function to display suggestions in the suggestions container
+function displaySuggestions(filteredPokemons) {
+  suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+  filteredPokemons.forEach(pokemon => {
+    const name = pokemon.querySelector('.name').innerText;
+    const number = pokemon.querySelector('.number').innerText;
+    suggestionsContainer.innerHTML += `<div class="suggestion">${name} ${number}</div>`;
+  });
+  suggestionsContainer.style.display = filteredPokemons.length > 0 ? 'block' : 'none';
+}
 
-    // Remove the leading '#' from the number and convert it to a number
-    var numberAsNumber = Number(number.replace('#', ''));
-
-    // Convert the search text to a number
-    var searchTextAsNumber = Number(searchText);
-
-    // If the Pokemon's name includes the search text, or the number equals the search text, show it, otherwise hide it
-    if (name.toLowerCase().includes(searchText.toLowerCase()) || numberAsNumber === searchTextAsNumber) {
-      pokemon[i].style.display = '';
-    } else {
-      pokemon[i].style.display = 'none';
-    }
+// Event listener for the search bar input
+searchBar.addEventListener('input', e => {
+  const searchText = e.target.value;
+  if (searchText.length === 0) {
+    // Hide suggestions when there is no input
+    suggestionsContainer.style.display = 'none';
+    // Show all pokemon cards when there is no input
+    Array.from(pokeContainer.getElementsByClassName('pokemon')).forEach(pokemon => {
+      pokemon.style.display = 'block';
+    });
+  } else {
+    // Filter and display suggestions based on input
+    const filteredPokemons = filterPokemon(searchText);
+    displaySuggestions(filteredPokemons);
+    // Hide all pokemon cards
+    Array.from(pokeContainer.getElementsByClassName('pokemon')).forEach(pokemon => {
+      pokemon.style.display = 'none';
+    });
+    // Show only filtered pokemon cards
+    filteredPokemons.forEach(pokemon => {
+      pokemon.style.display = 'block';
+    });
   }
 });
 
-// ... rest of your code ...
-
-var suggestionsContainer = document.createElement('div');
-suggestionsContainer.id = 'suggestions-container';
-document.body.appendChild(suggestionsContainer);
-
-document.getElementById('search-bar').addEventListener('input', function (e) {
-  var searchText = e.target.value; // Get the text from the search bar
-  var pokeContainer = document.getElementById('poke-container');
-  var pokemon = pokeContainer.getElementsByClassName('pokemon'); // Get all the Pokemon
-
-  // Clear the current suggestions
-  suggestionsContainer.innerHTML = '';
-
-  for (var i = 0; i < pokemon.length; i++) {
-    var name = pokemon[i].getElementsByClassName('info')[0].getElementsByClassName('name')[0].innerText; // Get the name of the Pokemon
-    var number = pokemon[i].getElementsByClassName('info')[0].getElementsByClassName('number')[0].innerText; // Get the number of the Pokemon
-
-    // Remove the leading '#' from the number and convert it to a number
-    var numberAsNumber = Number(number.replace('#', ''));
-
-    // Convert the search text to a number
-    var searchTextAsNumber = Number(searchText);
-
-    // If the Pokemon's name includes the search text, or the number equals the search text, add it to the suggestions
-    if (name.toLowerCase().includes(searchText.toLowerCase()) || numberAsNumber === searchTextAsNumber) {
-      var suggestion = document.createElement('div');
-      suggestion.innerText = name + ' ' + number;
-      suggestionsContainer.appendChild(suggestion);
-
-      suggestion.addEventListener('click', function () {
-        document.getElementById('search-bar').value = this.innerText;
-        suggestionsContainer.style.display = 'none';
-      });
-    }
-  }
-
-  // If the search bar is cleared, hide the suggestions container
-  if (searchText === '') {
+// Event listener for clicking on a suggestion
+suggestionsContainer.addEventListener('click', e => {
+  if (e.target && e.target.matches('.suggestion')) {
+    const text = e.target.innerText;
+    searchBar.value = text.split(' ')[0]; // Assuming the name is the first part before the space
     suggestionsContainer.style.display = 'none';
-  } else {
-    suggestionsContainer.style.display = 'block';
+    // Trigger the input event to filter based on the selected suggestion
+    searchBar.dispatchEvent(new Event('input'));
   }
 });
